@@ -1,2 +1,2 @@
-# exclude everything
+# exclude everything from resource folder
 resource/*
