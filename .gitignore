@@ -1,3 +1,5 @@
 # exclude everything from resource folder
 resource/*
+
+# exclude jupyter cache
 util/__pycache__/*
