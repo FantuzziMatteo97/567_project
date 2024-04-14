@@ -2,14 +2,14 @@ import pandas as pd
 import numpy as np
 
 
-def calculate_rsi(data, period=14):
+def calculate_rsi(data):
     '''
     :param data: stock price data
     :param period: period of dates
     :return: relative strength index (RSI)
     :rtype: float
     '''
-    delta = data['Close'].diff()
+    delta = data.diff()
     gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
     loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
 
