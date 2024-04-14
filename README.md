@@ -1,7 +1,7 @@
 # 567_project
 
 ## Why VOO
-
+We opted to utilize a dataset containing the daily statistics of the VOO symbol, which is a stock designed by Vanguard to mirror the S&P500. This choice allows us to forecast the S&P500 index's value more effectively without having to individually model and predict each constituent company. Given our constraints in terms of time and resources, this dataset empowers us to focus on developing and evaluating multiple models efficiently.
 ## Data Preprocessing
 - Add derived columns:
     - Relative Stock Index (default 2-week window)
