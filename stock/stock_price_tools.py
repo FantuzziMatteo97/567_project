@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-def calculate_rsi(data):
+def calculate_rsi(data, period=14):
     '''
     :param data: stock price data
     :param period: period of dates
