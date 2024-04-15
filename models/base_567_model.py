@@ -1,7 +1,7 @@
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 
-class Base561Model:
+class Base567Model:
     def __init__(self):
         self.scaler = MinMaxScaler(feature_range=(0,1))
 
