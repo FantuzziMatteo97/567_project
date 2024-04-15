@@ -3,7 +3,7 @@ import numpy as np
 
 class Base567Model:
     def __init__(self):
-        self.scaler = MinMaxScaler(feature_range=(0,1))
+        self.scaler = MinMaxScaler(feature_range=(0, 1))
 
     def preprocess(self, dataset):
         training_data_len = int(np.ceil(len(dataset) * .95))
