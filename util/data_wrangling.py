@@ -9,7 +9,6 @@ def get_dataset_df(file_path):
     dataset_df = dataset_df.dropna()
     # drop unused cols
     dataset_df = dataset_df.drop('Unnamed: 0',axis =1)
-    dataset_df = dataset_df.drop('Date', axis=1)
     return dataset_df
 
 def get_train_val_test_dfs(df, train_ratio=0.8, val_ratio=0.2):
