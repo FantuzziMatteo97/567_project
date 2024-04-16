@@ -1,14 +1,11 @@
-from keras.models import Sequential
+from keras.callbacks import ModelCheckpoint
+from keras.models import Sequential, load_model
 from keras.layers import SimpleRNN, Dropout, Dense, Input
 import numpy as np
 
-from models.base_567_model import Base567Model
-
-
-class RNN(Base567Model):
-    def __init__(self, timesteps, input_d, optimizer = 'adam', loss='mean_squared_error'):
+class RNN:
+    def __init__(self, timesteps=5, input_d=1, optimizer='adam', loss='mean_squared_error'):
         super().__init__()
-        self.timesteps = timesteps
         self.model = Sequential([
             Input(shape=(timesteps, input_d)),
             SimpleRNN(50, return_sequences=True),
@@ -20,17 +17,22 @@ class RNN(Base567Model):
 
         self.model.compile(optimizer=optimizer, loss=loss)
 
-    def preprocessing(self, x, y):
-        x_seq, y_seq = [], []
-        for i in range(len(x) - self.timesteps):
-            x_seq.append(x[i:i+self.timesteps])
-            y_seq.append(y[i:i+self.timesteps])
-        return np.array(x_seq), np.array(y_seq)
+    def train(self, X_train, y_train, epochs=50, batch_size=32):
+        # Define ModelCheckpoint callback to save the model with the best validation loss
+        checkpoint_filepath = '.best_rnn.model.keras'
+        checkpoint = ModelCheckpoint(
+            filepath=checkpoint_filepath,
+            monitor='val_loss',
+            mode='max',
+            save_best_only=True)
 
-    def train(self, x_train, y_train, batch_size=64, epochs=50):
-        preprocessed_x, preprocessed_y = self.preprocessing(x_train, y_train)
-        self.model.fit(preprocessed_x, preprocessed_y, batch_size, epochs)
+        # Fit the model with callbacks
+        self.model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.2, callbacks=[checkpoint])
 
-    def test(self, x_test, y_test):
-        predictions = self.model.predict(x_test)
-        return self.postprocess(predictions, y_test)
+    def predict(self, x_test, scaler):
+        return scaler.inverse_transform(self.model.predict(x_test))
+    
+    def evaluate(self, X_test, y_test):
+        self.model = load_model('.best_rnn.model.keras')
+        test_loss = self.model.evaluate(X_test, y_test)
+        return test_loss
