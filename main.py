@@ -21,20 +21,21 @@ def main():
     val_df[val_df.columns.difference(['Close'])] = scaler.transform(val_df[val_df.columns.difference(['Close'])])
 
     # convert dfs to timeseries data
-    X_train, y_train = create_timeseries_dataset(train_df, target_col='Close', timesteps=10)
-    X_val, y_val = create_timeseries_dataset(val_df, target_col='Close', timesteps=10)
+    X_train, y_train = create_timeseries_dataset(train_df, target_col='Close', timesteps=50)
+    X_val, y_val = create_timeseries_dataset(val_df, target_col='Close', timesteps=50)
 
     # define model architecture
-    rnn_model = RNN(timesteps=10, input_d=13)
+    rnn_model = RNN(scaler=close_scaler, timesteps=50, input_d=13)
     rnn_model.train(X_train, y_train, X_val, y_val, batch_size=32, epochs=50)
 
-    # evaluate test loss
+    # evaluate train and val loss
+    y_train = close_scaler.inverse_transform(y_train.reshape(-1, 1))
+    y_val = close_scaler.inverse_transform(y_val.reshape(-1, 1))
     print(f'Final training MSE: {rnn_model.evaluate(X_train, y_train)}')
     print(f'Final validation MSE: {rnn_model.evaluate(X_val, y_val)}')
 
     # graph predictions on train set
-    y_pred_train = rnn_model.predict(X_train, close_scaler)
-    y_train = close_scaler.inverse_transform(y_train.reshape(-1, 1))
+    y_pred_train = rnn_model.predict(X_train)
     plt.figure(figsize = (30,10))
     plt.plot(y_pred_train, color = "b", label = "y_pred_train" )
     plt.plot(y_train, color = "g", label = "y_train")
@@ -45,8 +46,7 @@ def main():
     plt.show()
 
     # graph predictions on val set
-    y_pred_val = rnn_model.predict(X_val, close_scaler)
-    y_val = close_scaler.inverse_transform(y_val.reshape(-1, 1))
+    y_pred_val = rnn_model.predict(X_val)
     plt.figure(figsize = (30,10))
     plt.plot(y_pred_val, color = "b", label = "y_pred_val" )
     plt.plot(y_val, color = "g", label = "y_val")

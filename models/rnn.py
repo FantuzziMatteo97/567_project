@@ -4,8 +4,9 @@ from keras.layers import SimpleRNN, Dropout, Dense, Input
 import numpy as np
 
 class RNN:
-    def __init__(self, timesteps=5, input_d=1, optimizer='adam', loss='mean_squared_error'):
+    def __init__(self, scaler, timesteps=5, input_d=1, optimizer='adam', loss='mean_squared_error'):
         super().__init__()
+        self.scaler = scaler
         self.model = Sequential([
             Input(shape=(timesteps, input_d)),
             SimpleRNN(50, return_sequences=True),
@@ -30,10 +31,11 @@ class RNN:
         history = self.model.fit(x=X_train, y=y_train, batch_size=batch_size, epochs=epochs, validation_data=(X_val, y_val), callbacks=[checkpoint])
         return history
 
-    def predict(self, X, scaler):
-        return scaler.inverse_transform(self.model.predict(X))
+    def predict(self, X):
+        return self.scaler.inverse_transform(self.model.predict(X))
     
-    def evaluate(self, X_test, y_test):
+    def evaluate(self, X, y):
         self.model = load_model('.best_rnn.model.keras')
-        test_loss = self.model.evaluate(X_test, y_test)
-        return test_loss
+        y_pred = self.predict(X)
+        mse = np.mean((y - y_pred) ** 2)
+        return mse
