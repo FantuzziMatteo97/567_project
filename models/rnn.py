@@ -17,17 +17,18 @@ class RNN:
 
         self.model.compile(optimizer=optimizer, loss=loss)
 
-    def train(self, X_train, y_train, epochs=50, batch_size=32):
+    def train(self, X_train, y_train, X_val, y_val, epochs=50, batch_size=32):
         # Define ModelCheckpoint callback to save the model with the best validation loss
         checkpoint_filepath = '.best_rnn.model.keras'
         checkpoint = ModelCheckpoint(
             filepath=checkpoint_filepath,
             monitor='val_loss',
-            mode='max',
+            mode='min',
             save_best_only=True)
 
         # Fit the model with callbacks
-        self.model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.2, callbacks=[checkpoint])
+        history = self.model.fit(x=X_train, y=y_train, batch_size=batch_size, epochs=epochs, validation_data=(X_val, y_val), callbacks=[checkpoint])
+        return history
 
     def predict(self, X, scaler):
         return scaler.inverse_transform(self.model.predict(X))
