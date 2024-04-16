@@ -29,8 +29,8 @@ class RNN:
         # Fit the model with callbacks
         self.model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.2, callbacks=[checkpoint])
 
-    def predict(self, x_test, scaler):
-        return scaler.inverse_transform(self.model.predict(x_test))
+    def predict(self, X, scaler):
+        return scaler.inverse_transform(self.model.predict(X))
     
     def evaluate(self, X_test, y_test):
         self.model = load_model('.best_rnn.model.keras')
