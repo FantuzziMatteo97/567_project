@@ -3,7 +3,7 @@ from keras.layers import SimpleRNN, Dropout, Dense, Input
 
 from models.base_model import BaseModel
 
-class RNN(BaseModel):
+class RNNModel(BaseModel):
     def __init__(self, scaler, input_shape, optimizer='adam', loss='mean_squared_error'):
         super().__init__(scaler, input_shape, optimizer, loss)
 

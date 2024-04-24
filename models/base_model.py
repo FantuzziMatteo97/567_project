@@ -42,7 +42,7 @@ class BaseModel:
         Returns:
             History: Object containing training history.
         """
-        checkpoint_filepath = f'.best_{self.__class__.__name__.lower()}.model.keras'
+        checkpoint_filepath = f'.best_{self.__class__.__name__.lower()}.keras'
         checkpoint = ModelCheckpoint(
             filepath=checkpoint_filepath,
             monitor='val_loss',

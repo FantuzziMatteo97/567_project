@@ -1,24 +1,22 @@
 from keras.models import Sequential
-from keras.layers import Dense, LSTM
-from sklearn.preprocessing import MinMaxScaler
+from keras.layers import Dense, Dropout, LSTM, Input
 
-from models.base_567_model import Base567Model
+from models.base_model import BaseModel
 
+class LSTMModel(BaseModel):
+    def __init__(self, scaler, input_shape, optimizer='adam', loss='mean_squared_error'):
+        super().__init__(scaler, input_shape, optimizer, loss)
 
-class LSTM(Base567Model):
-    def __init__(self, input_shape, optimizer='adam', loss='mean_squared_error'):
-        super().__init__()
-        self.model = Sequential()
-        self.model.add(LSTM(128, return_sequences=True, input_shape=input_shape))
-        self.model.add(LSTM(64, return_sequences=False))
-        self.model.add(Dense(25))
-        self.model.add(Dense(1))
-        self.model.compile(optimizer=optimizer, loss=loss)
-
-    def train(self, data, batch_size=1, epochs=1):
-        x_train, y_train = self.preprocess(data)
-        self.model.fit(x_train, y_train, batch_size, epochs)
-
-    def test(self, x_test, y_test):
-        predictions = self.model.predict(x_test)
-        return self.postprocess(predictions, y_test)
+    def build_model(self):
+        self.model = Sequential([
+            Input(shape=self.input_shape),
+            LSTM(50, return_sequences=True),
+            Dropout(0.2),
+            LSTM(50, return_sequences=True),
+            Dropout(0.2),
+            LSTM(50, return_sequences=True),
+            Dropout(0.2),
+            LSTM(50, return_sequences=False),
+            Dropout(0.2),
+            Dense(1)
+        ])
