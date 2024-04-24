@@ -3,3 +3,7 @@ resource/*
 
 # exclude jupyter cache
 util/__pycache__/*
+
+*.DS_Store
+*.keras
+*/__pycache__
