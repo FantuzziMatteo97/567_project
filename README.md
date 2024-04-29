@@ -13,7 +13,7 @@ We opted to utilize a dataset containing the daily statistics of the VOO symbol,
         - 120 days (quarterly)
 
 ## Model Training
-- Input (d = 10 days of historical data):
+- Input (`timesteps` days of historical data):
     - Open
     - High
     - Low
