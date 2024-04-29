@@ -13,20 +13,18 @@ class Transformer(BaseModel):
         super().__init__(scaler, input_shape, optimizer, loss)
 
     def build_model(self):
-        seq_len = 5
-
-        d_k = 256
-        d_v = 256
-        n_heads = 12
+        d_k = 256 * 2
+        d_v = 256 * 2
+        n_heads = 5
         ff_dim = 256
 
-        time_embedding = Time2Vector(seq_len)
+        time_embedding = Time2Vector(self.input_shape[0])
         attn_layer1 = TransformerEncoder(d_k, d_v, n_heads, ff_dim)
         attn_layer2 = TransformerEncoder(d_k, d_v, n_heads, ff_dim)
         attn_layer3 = TransformerEncoder(d_k, d_v, n_heads, ff_dim)
 
         '''Construct model'''
-        in_seq = Input(shape=(seq_len, 13))
+        in_seq = Input(shape=self.input_shape)
         x = time_embedding(in_seq)
         x = Concatenate(axis=-1)([in_seq, x])
         x = attn_layer1((x, x, x))
@@ -39,8 +37,6 @@ class Transformer(BaseModel):
         out = Dense(1, activation='linear')(x)
 
         self.model = Model(inputs=in_seq, outputs=out)
-
-
 
 class Time2Vector(keras.Layer):
     def __init__(self, seq_len, **kwargs):
