@@ -7,21 +7,23 @@ import keras
 
 from models.base_model import BaseModel
 
-
 class Transformer(BaseModel):
     def __init__(self, scaler, input_shape, optimizer='adam', loss='mean_squared_error'):
         super().__init__(scaler, input_shape, optimizer, loss)
 
     def build_model(self):
-        d_k = 256 * 2
-        d_v = 256 * 2
-        n_heads = 5
-        ff_dim = 256
+
+        d_k = 1000
+        d_v = 1000
+        n_heads = 12
+        ff_dim = 512
 
         time_embedding = Time2Vector(self.input_shape[0])
         attn_layer1 = TransformerEncoder(d_k, d_v, n_heads, ff_dim)
         attn_layer2 = TransformerEncoder(d_k, d_v, n_heads, ff_dim)
         attn_layer3 = TransformerEncoder(d_k, d_v, n_heads, ff_dim)
+        attn_layer4 = TransformerEncoder(d_k, d_v, n_heads, ff_dim)
+
 
         '''Construct model'''
         in_seq = Input(shape=self.input_shape)
@@ -30,6 +32,7 @@ class Transformer(BaseModel):
         x = attn_layer1((x, x, x))
         x = attn_layer2((x, x, x))
         x = attn_layer3((x, x, x))
+        x = attn_layer4((x,x,x))
         x = GlobalAveragePooling1D(data_format='channels_first')(x)
         x = Dropout(0.1)(x)
         x = Dense(64, activation='relu')(x)
