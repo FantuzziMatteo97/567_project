@@ -4,6 +4,7 @@ from sklearn.preprocessing import MinMaxScaler
 from models.rnn import RNNModel
 from models.lstm import LSTMModel
 from models.transformer_test import Transformer
+from models.linear import LinearModel
 from util.data_wrangling import convert_df_to_sequences, get_dataset_df, train_val_test_split
 
 def main(model_type, timesteps, batch_size, epochs):
@@ -36,16 +37,18 @@ def main(model_type, timesteps, batch_size, epochs):
         model = LSTMModel(scaler=close_scaler, input_shape=X_train.shape[1:])
     elif model_type.lower() == 'transformer':
         model = Transformer(scaler=close_scaler, input_shape=X_train.shape[1:])
+    elif model_type.lower() == 'linear':
+        model = LinearModel(scaler=close_scaler, input_shape=X_train.shape[1:])
     else:
         raise ValueError("Invalid model type.")
     
     # train model
     history = model.train(X_train, y_train, X_val, y_val, batch_size=batch_size, epochs=epochs)
-
     # evaluate train, val, and test MSE
     y_train = close_scaler.inverse_transform(y_train.reshape(-1, 1))
     y_val = close_scaler.inverse_transform(y_val.reshape(-1, 1))
     y_test = close_scaler.inverse_transform(y_test.reshape(-1, 1))
+
     print(f'Final training MSE: {model.evaluate(X_train, y_train):.4f}')
     print(f'Final validation MSE: {model.evaluate(X_val, y_val):.4f}')
     print(f'Final test MSE: {model.evaluate(X_test, y_test):.4f}')
@@ -85,7 +88,7 @@ def main(model_type, timesteps, batch_size, epochs):
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Train and evaluate deep learning model for stock price prediction")
-    parser.add_argument("model_type", type=str, choices=['rnn', 'lstm', 'transformer'], help="Type of model to train")
+    parser.add_argument("model_type", type=str, choices=['rnn', 'lstm', 'transformer', 'linear'], help="Type of model to train")
     parser.add_argument("--timesteps", type=int, default=5, help="Number of timesteps for input sequences (default: 5)")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training (default: 32)")
     parser.add_argument("--epochs", type=int, default=50, help="Number of epochs for training (default: 50)")

@@ -66,6 +66,7 @@ class BaseModel:
         Returns:
             numpy.ndarray: Predicted values.
         """
+        print("X shape: ", X.shape)
         return self.scaler.inverse_transform(self.model.predict(X))
     
     def evaluate(self, X, y):
