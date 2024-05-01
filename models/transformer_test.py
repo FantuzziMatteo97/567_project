@@ -13,16 +13,13 @@ class Transformer(BaseModel):
 
     def build_model(self):
 
-        d_k = 1000
-        d_v = 1000
-        n_heads = 12
-        ff_dim = 512
+        d_k = 6
+        d_v = 6
+        n_heads = 8
+        ff_dim = 10
 
         time_embedding = Time2Vector(self.input_shape[0])
         attn_layer1 = TransformerEncoder(d_k, d_v, n_heads, ff_dim)
-        attn_layer2 = TransformerEncoder(d_k, d_v, n_heads, ff_dim)
-        attn_layer3 = TransformerEncoder(d_k, d_v, n_heads, ff_dim)
-        attn_layer4 = TransformerEncoder(d_k, d_v, n_heads, ff_dim)
 
 
         '''Construct model'''
@@ -30,9 +27,6 @@ class Transformer(BaseModel):
         x = time_embedding(in_seq)
         x = Concatenate(axis=-1)([in_seq, x])
         x = attn_layer1((x, x, x))
-        x = attn_layer2((x, x, x))
-        x = attn_layer3((x, x, x))
-        x = attn_layer4((x,x,x))
         x = GlobalAveragePooling1D(data_format='channels_first')(x)
         x = Dropout(0.1)(x)
         x = Dense(64, activation='relu')(x)
