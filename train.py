@@ -1,12 +1,11 @@
 import argparse
 from matplotlib import pyplot as plt
-from sklearn.preprocessing import MinMaxScaler
-
-from models.naive_bayes import NaiveBayes
-from models.rnn import RNNModel
+from models.decoder_transformer import DecoderTransformer
+from models.encoder_transformer import EncoderTransformer
 from models.lstm import LSTMModel
-from models.transformer_test import Transformer
-from util.data_wrangling import convert_df_to_sequences, get_dataset_df, train_val_test_split
+from models.rnn import RNNModel
+from sklearn.preprocessing import MinMaxScaler
+from util.data_wrangling import convert_df_to_inputs_targets, get_dataset_df, train_val_test_split
 
 def main(model_type, timesteps, batch_size, epochs):
     # read and process data
@@ -25,26 +24,28 @@ def main(model_type, timesteps, batch_size, epochs):
     val_df[val_df.columns.difference(['Close'])] = scaler.transform(val_df[val_df.columns.difference(['Close'])])
     test_df[test_df.columns.difference(['Close'])] = scaler.transform(test_df[test_df.columns.difference(['Close'])])
 
-    # convert dfs to timeseries data
-    X_train, y_train = convert_df_to_sequences(train_df, target_col='Close', timesteps=timesteps)
-    X_val, y_val = convert_df_to_sequences(val_df, target_col='Close', timesteps=timesteps)
-    X_test, y_test = convert_df_to_sequences(test_df, target_col='Close', timesteps=timesteps)
-    print(X_train.shape)
+    # convert dfs to input sequences and targets for deep learning sequential models
+    X_train, y_decoder_train, y_train = convert_df_to_inputs_targets(train_df, target_col='Close', timesteps=timesteps)
+    X_val, y_decoder_val, y_val = convert_df_to_inputs_targets(val_df, target_col='Close', timesteps=timesteps)
+    X_test, _, y_test = convert_df_to_inputs_targets(test_df, target_col='Close', timesteps=timesteps)
 
     # define model architecture
     if model_type.lower() == 'rnn':
         model = RNNModel(scaler=close_scaler, input_shape=X_train.shape[1:])
     elif model_type.lower() == 'lstm':
         model = LSTMModel(scaler=close_scaler, input_shape=X_train.shape[1:])
-    elif model_type.lower() == 'transformer':
-        model = Transformer(scaler=close_scaler, input_shape=X_train.shape[1:])
-    elif model_type.lower() == 'naive_bayes':
-        model = NaiveBayes(scaler=close_scaler, input_shape=X_train.shape[1:])
+    elif model_type.lower() == 'encoder':
+        model = EncoderTransformer(scaler=close_scaler, input_shape=X_train.shape[1:])
+    elif model_type.lower() == 'decoder':
+        model = DecoderTransformer(scaler=close_scaler, input_shape=X_train.shape[1:])
     else:
         raise ValueError("Invalid model type.")
     
     # train model
-    history = model.train(X_train, y_train, X_val, y_val, batch_size=batch_size, epochs=epochs)
+    if model_type.lower() == 'decoder':
+        history = model.train(X_train, y_decoder_train, X_val, y_decoder_val, batch_size=batch_size, epochs=epochs)
+    else:
+        history = model.train(X_train, y_train, X_val, y_val, batch_size=batch_size, epochs=epochs)
 
     # evaluate train, val, and test MSE
     y_train = close_scaler.inverse_transform(y_train.reshape(-1, 1))
@@ -89,7 +90,7 @@ def main(model_type, timesteps, batch_size, epochs):
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Train and evaluate deep learning model for stock price prediction")
-    parser.add_argument("model_type", type=str, choices=['rnn', 'lstm', 'transformer', 'naive_bayes'], help="Type of model to train")
+    parser.add_argument("model_type", type=str, choices=['rnn', 'lstm', 'encoder', 'decoder'], help="Type of model to train")
     parser.add_argument("--timesteps", type=int, default=5, help="Number of timesteps for input sequences (default: 5)")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training (default: 32)")
     parser.add_argument("--epochs", type=int, default=50, help="Number of epochs for training (default: 50)")

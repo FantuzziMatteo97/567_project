@@ -26,9 +26,10 @@ def train_val_test_split(df, train_ratio=0.6, val_ratio=0.2, test_ratio=0.2):
 
     return train_df, val_df, test_df
 
-def convert_df_to_sequences(df, target_col, timesteps=5):
-    X, y = [], []
+def convert_df_to_inputs_targets(df, target_col, timesteps=5):
+    X, y_decoder, y = [], [], []
     for i in range(len(df) - timesteps):
         X.append(df.iloc[i:i+timesteps].values)
+        y_decoder.append(df.iloc[i+1:i+timesteps+1][target_col].values)
         y.append(df.iloc[i+timesteps][target_col])
-    return np.array(X), np.array(y)
+    return np.array(X), np.array(y_decoder), np.array(y)
