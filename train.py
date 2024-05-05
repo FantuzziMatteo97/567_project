@@ -84,6 +84,7 @@ def main(model_type, timesteps, batch_size, epochs):
     plt.ylabel("Close price")
     plt.title(f"{model_type.upper()} | Actual vs Predicted Close Price | Train")
     plt.legend()
+    plt.savefig(f'results/{model_type.lower()}/train_pred_plot')
     plt.show()
 
     # graph predictions on val set
@@ -98,6 +99,7 @@ def main(model_type, timesteps, batch_size, epochs):
     plt.ylabel("Close price")
     plt.title(f"{model_type.upper()} | Actual vs Predicted Close Price | Validation")
     plt.legend()
+    plt.savefig(f'results/{model_type.lower()}/val_pred_plot')
     plt.show()
 
     # graph predictions on test set
@@ -112,6 +114,7 @@ def main(model_type, timesteps, batch_size, epochs):
     plt.ylabel("Close price")
     plt.title(f"{model_type.upper()} | Actual vs Predicted Close Price | Test")
     plt.legend()
+    plt.savefig(f'results/{model_type.lower()}/test_pred_plot')
     plt.show()
     
 if __name__ == '__main__':
