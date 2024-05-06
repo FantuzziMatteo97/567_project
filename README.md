@@ -36,6 +36,6 @@ We opted to utilize a dataset containing the daily statistics of the VOO symbol,
 ## How to Run
 Execute the following command in the terminal to run the model:
 ```sh
-python train.py  [model_name] --epochs=n --timestep=t --batch_size=b
+python train.py  [model_name] --timesteps=t --batch_size=b --epochs=n
 ```
 model name is either rnn, linear, encoder, decoder or lstm
