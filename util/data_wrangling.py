@@ -33,3 +33,16 @@ def convert_df_to_inputs_targets(df, target_col, timesteps=5):
         y_decoder.append(df.iloc[i+1:i+timesteps+1][target_col].values)
         y.append(df.iloc[i+timesteps][target_col])
     return np.array(X), np.array(y_decoder), np.array(y)
+
+def convert_to_trend_labels(prices):
+    """
+        Convert stock prices to binary trend labels:
+        1 (up) or 0 (down or unchanged).
+        """
+    # Calculate differences between consecutive days
+    trend_diff = np.diff(prices) > 0
+
+    # Insert 0 for the first day (no previous comparison)
+    trend_labels = np.insert(trend_diff.astype(int), 0, 0)
+
+    return trend_labels

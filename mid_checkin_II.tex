@@ -1,0 +1,88 @@
+\documentclass{article}
+\usepackage{titling}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{multicol}
+\usepackage[margin=2cm]{geometry}
+\setlength\parindent{0pt}
+\usepackage{url}
+\setlength{\droptitle}{-5em}
+\usepackage{hyperref}
+
+\title{Predicting Stock Prices Using Deep Learning Sequential Models}
+\author{Matteo Fantuzzi, Sean Gai, Jiwon Hae, Justin Zeng}
+\date{}
+\begin{document}
+
+\maketitle
+\section*{Background}
+This research aims to compare the effectiveness of Transformer models to traditional RNNs and their extensions like LSTMs in stock market forecasting. Specifically, we will investigate whether the ability of Transformers to consider a larger context window of stock price history offers an advantage in predicting future prices. We will be training our models on a Kaggle dataset that tracks the NASDAQ Composite.
+
+\section*{Exploratory Data Analysis}
+So why VOO?
+We opted to utilize a dataset containing the daily statistics of the VOO symbol, which is a stock designed by Vanguard to mirror the S&P500. This choice allows us to forecast the S&P500 index's value more effectively without having to individually model and predict each constituent company. Given our constraints in terms of time and resources, this dataset empowers us to focus on developing and evaluating multiple models efficiently. \\
+
+In the data preprocessing phase, several derived columns are added to enhance the dataset for model training. These features were referenced from common tools used by the financial professionals and also from the approach taken in the \href{https://www.nature.com/articles/s41599-024-02807-x}{nature thesis} :
+\begin{itemize}
+    \item Relative Stock Index (default 2-week window): This metric evaluates the stock's performance relative to a broader market index over a two-week period.
+
+    \item Moving Average Convergence Divergence (MACD): MACD is a trend-following momentum indicator that shows the relationship between two moving averages of a security’s price.
+
+    \item Simple Moving Average (SMA): SMA is calculated by averaging the closing prices of a security over various time periods. Different SMA periods are considered to capture different trends:
+
+    5 days (weekly),
+    20 days (monthly),
+    60 days (bi-monthly),
+    120 days (quarterly)
+\end{itemize}
+\begin{center}
+\includegraphics[width=15cm]{resources/SMA_diff_graph.jpg} \\
+    fig 1: SMA Differences Over Days
+\end{center}
+
+\section*{Exploring RNN Architectures}
+In the search best model, we have reference previous Kaggle contributions, and \href{https://iopscience.iop.org/article/10.1088/1742-6596/1650/3/032103/pdf}{journals} for the best architecture for our base models. Some of our exploration is as follows: 
+\begin{multicols}{2}
+    \begin{center}
+    \includegraphics[width=4cm]{resources/RNN_architecture_explored_1.png} \\
+        fig 2: RNN architecture explored
+    \end{center}
+    \columnbreak
+    \begin{center}
+        \includegraphics[width=4cm]{resources/RNN_architecture_explored_2.jpeg} \\
+            fig 3: RNN architecture explored
+    \end{center}
+\end{multicols}
+
+\newpage
+\section*{Baseline RNN implementation}
+These are the results obtained from the RNN model implemented on the training and validation set.
+\begin{center}
+    \includegraphics[width=1\textwidth]{resources/train_accuracy.png}\\
+    fig 4: Predicted Open Prices vs Open Prices Over Days on Training Set
+    \newline
+    \includegraphics[width=1\textwidth]{resources/validation_accuracy.png}\\
+    fig 5: Predicted Open Prices vs Open Prices Over Days on Validation Set
+\end{center}
+\begin{center}
+    \includegraphics[width=10cm]{resources/training_loss_vs_500_epoch_graph.jpg} \\
+    fig 6: Training Loss over 500 epochs
+\end{center}
+\newpage
+
+\section*{Milestone towards the Final Report}
+\subsection*{Tasks:}
+\begin{itemize}
+    \item Define the model architecture, LSTM and Transformer algorithms, and evaluation metrics.
+    \item Train, validate, and optimize the models using the preprocessed data.
+    \item Compare against baseline models or benchmarks.
+    \item Draft detailed sections of the report.
+\end{itemize}
+
+\subsection*{Deliverables:}
+\begin{itemize}
+    \item Trained LSTM and Transformer files.
+    \item Model evaluation results and analysis.
+    \item Detailed analysis report with visualizations.
+    \item Final report and slides.
+\end{itemize}
+\end{document}

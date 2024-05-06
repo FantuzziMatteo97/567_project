@@ -8,7 +8,7 @@ from models.lstm import LSTMModel
 from models.rnn import RNNModel
 from models.naive_bayes import NaiveBayes
 from sklearn.preprocessing import MinMaxScaler
-from util.data_wrangling import convert_df_to_inputs_targets, get_dataset_df, train_val_test_split
+from util.data_wrangling import convert_df_to_inputs_targets, get_dataset_df, train_val_test_split, convert_to_trend_labels
 
 def setup(model_type):
     if not os.path.isdir(f'results/{model_type.lower()}'):
@@ -45,6 +45,11 @@ def main(model_type, timesteps, batch_size, epochs):
     X_val_flattened = X_val.reshape((n_val, timesteps * d))
     X_test_flattened = X_test.reshape((n_test, timesteps * d))
 
+    # Convert prices to trend labels (0: down, 1: up) for naive bayes
+    y_train_binary = convert_to_trend_labels(y_train)
+    y_val_binary = convert_to_trend_labels(y_val)
+    y_test_binary = convert_to_trend_labels(y_test)
+
     # define model architecture
     if model_type.lower() == 'rnn':
         model = RNNModel(scaler=close_scaler, input_shape=X_train.shape[1:])
@@ -57,7 +62,7 @@ def main(model_type, timesteps, batch_size, epochs):
     elif model_type.lower() == 'linear':
         model = LinearModel(scaler=close_scaler, input_shape=X_train_flattened.shape[1:])
     elif model_type.lower() == 'naive_bayes':
-        model = NaiveBayes(scaler=close_scaler, input_shape=X_train_flattened.shape[1:])
+        model = NaiveBayes()
     else:
         raise ValueError("Invalid model type.")
     
@@ -66,6 +71,8 @@ def main(model_type, timesteps, batch_size, epochs):
         history = model.train(X_train, y_decoder_train, X_val, y_decoder_val, batch_size=batch_size, epochs=epochs)
     elif model_type.lower() == 'linear':
         history = model.train(X_train_flattened, y_train, X_val_flattened, y_val, batch_size=batch_size, epochs=epochs)
+    elif model_type.lower() == 'naive_bayes':
+        history = model.train(X_train_flattened, y_train_binary)
     else:
         history = model.train(X_train, y_train, X_val, y_val, batch_size=batch_size, epochs=epochs)
 
@@ -77,6 +84,10 @@ def main(model_type, timesteps, batch_size, epochs):
         print(f'Final training MSE: {model.evaluate(X_train_flattened, y_train_unscaled):.4f}')
         print(f'Final validation MSE: {model.evaluate(X_val_flattened, y_val_unscaled):.4f}')
         print(f'Final test MSE: {model.evaluate(X_test_flattened, y_test_unscaled):.4f}')
+    elif model_type.lower() == 'naive_bayes':
+        print(f'Final training MSE: {model.evaluate(X_train_flattened, y_train_binary)}')
+        print(f'Final validation MSE: {model.evaluate(X_val_flattened, y_val_binary)}')
+        print(f'Final test MSE: {model.evaluate(X_test_flattened, y_test_binary)}')
     else:
         print(f'Final training MSE: {model.evaluate(X_train, y_train_unscaled):.4f}')
         print(f'Final validation MSE: {model.evaluate(X_val, y_val_unscaled):.4f}')
@@ -85,47 +96,89 @@ def main(model_type, timesteps, batch_size, epochs):
     # graph predictions on train set
     if model_type.lower() == 'linear':
         y_pred_train = model.predict(X_train_flattened)
+    elif model_type.lower() == 'naive_bayes':
+        y_pred_train = model.predict(X_train_flattened)
     else:
         y_pred_train = model.predict(X_train)
-    plt.figure(figsize = (30,10))
-    plt.plot(y_pred_train, color="b", label="y_pred_train" )
-    plt.plot(y_train_unscaled, color="g", label="y_train")
-    plt.xlabel("Days")
-    plt.ylabel("Close price")
-    plt.title(f"{model_type.upper()} | Actual vs Predicted Close Price | Train")
-    plt.legend()
-    plt.savefig(f'results/{model_type.lower()}/train_pred_plot')
-    plt.show()
+
+    if model_type.lower() == 'naive_bayes':
+        plt.figure(figsize=(30, 10))
+        plt.plot(y_pred_train, color="b", label="y_pred_train")
+        plt.plot(y_train_binary, color="g", label="y_train")
+        plt.xlabel("Days")
+        plt.ylabel("Close price")
+        plt.title(f"{model_type.upper()} | Actual vs Predicted Close Price | Train")
+        plt.legend()
+        plt.savefig(f'results/{model_type.lower()}/train_pred_plot')
+        plt.show()
+    else:
+        plt.figure(figsize = (30,10))
+        plt.plot(y_pred_train, color="b", label="y_pred_train" )
+        plt.plot(y_train_unscaled, color="g", label="y_train")
+        plt.xlabel("Days")
+        plt.ylabel("Close price")
+        plt.title(f"{model_type.upper()} | Actual vs Predicted Close Price | Train")
+        plt.legend()
+        plt.savefig(f'results/{model_type.lower()}/train_pred_plot')
+        plt.show()
 
     # graph predictions on val set
     if model_type.lower() == 'linear':
         y_pred_val = model.predict(X_val_flattened)
+    elif model_type.lower() == 'naive_bayes':
+        y_pred_val = model.predict(X_val_flattened)
     else:
         y_pred_val = model.predict(X_val)
-    plt.figure(figsize = (30,10))
-    plt.plot(y_pred_val, color="b", label="y_pred_val" )
-    plt.plot(y_val_unscaled, color="g", label="y_val")
-    plt.xlabel("Days")
-    plt.ylabel("Close price")
-    plt.title(f"{model_type.upper()} | Actual vs Predicted Close Price | Validation")
-    plt.legend()
-    plt.savefig(f'results/{model_type.lower()}/val_pred_plot')
-    plt.show()
+
+    if model_type.lower() == 'naive_bayes':
+        plt.figure(figsize=(30, 10))
+        plt.plot(y_pred_val, color="b", label="y_pred_val")
+        plt.plot(y_val_binary, color="g", label="y_val")
+        plt.xlabel("Days")
+        plt.ylabel("Close price")
+        plt.title(f"{model_type.upper()} | Actual vs Predicted Close Price | Validation")
+        plt.legend()
+        plt.savefig(f'results/{model_type.lower()}/val_pred_plot')
+        plt.show()
+    else:
+        plt.figure(figsize = (30,10))
+        plt.plot(y_pred_val, color="b", label="y_pred_val" )
+        plt.plot(y_val_unscaled, color="g", label="y_val")
+        plt.xlabel("Days")
+        plt.ylabel("Close price")
+        plt.title(f"{model_type.upper()} | Actual vs Predicted Close Price | Validation")
+        plt.legend()
+        plt.savefig(f'results/{model_type.lower()}/val_pred_plot')
+        plt.show()
 
     # graph predictions on test set
     if model_type.lower() == 'linear':
         y_pred_test = model.predict(X_test_flattened)
+    elif model_type.lower() == 'naive_bayes':
+        y_pred_test = model.predict(X_test_flattened)
     else:
         y_pred_test = model.predict(X_test)
-    plt.figure(figsize = (30,10))
-    plt.plot(y_pred_test, color="b", label="y_pred_test" )
-    plt.plot(y_test_unscaled, color="g", label="y_test")
-    plt.xlabel("Days")
-    plt.ylabel("Close price")
-    plt.title(f"{model_type.upper()} | Actual vs Predicted Close Price | Test")
-    plt.legend()
-    plt.savefig(f'results/{model_type.lower()}/test_pred_plot')
-    plt.show()
+
+    if model_type.lower() == 'naive_bayes':
+        plt.figure(figsize=(30, 10))
+        plt.plot(y_pred_test, color="b", label="y_pred_test")
+        plt.plot(y_test_binary, color="g", label="y_test")
+        plt.xlabel("Days")
+        plt.ylabel("Close price")
+        plt.title(f"{model_type.upper()} | Actual vs Predicted Close Price | Test")
+        plt.legend()
+        plt.savefig(f'results/{model_type.lower()}/test_pred_plot')
+        plt.show()
+    else:
+        plt.figure(figsize = (30,10))
+        plt.plot(y_pred_test, color="b", label="y_pred_test" )
+        plt.plot(y_test_unscaled, color="g", label="y_test")
+        plt.xlabel("Days")
+        plt.ylabel("Close price")
+        plt.title(f"{model_type.upper()} | Actual vs Predicted Close Price | Test")
+        plt.legend()
+        plt.savefig(f'results/{model_type.lower()}/test_pred_plot')
+        plt.show()
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Train and evaluate deep learning model for stock price prediction")
