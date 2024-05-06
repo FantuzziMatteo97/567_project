@@ -39,3 +39,9 @@ Execute the following command in the terminal to run the model:
 python train.py  [model_name] --timesteps=t --batch_size=b --epochs=n
 ```
 model name is either rnn, linear, encoder, decoder or lstm
+
+Execute the following command in the terminal to generate plots of all models with the best performing checkpoint:
+```sh
+python test.py --timesteps=t
+```
+timesteps used to generate the optimal plot should be identical to ones used in the training
