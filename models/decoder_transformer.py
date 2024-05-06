@@ -19,10 +19,10 @@ class DecoderTransformer(BaseModel):
         super().__init__(scaler, input_shape, optimizer, loss)
 
     def build_model(self):
-        d_k = 8
-        d_v = 8
-        n_heads = 8
-        d_ff = 16
+        d_k = 9
+        d_v = 9
+        n_heads = 6
+        d_ff = 13
 
         sequence_length = self.input_shape[0]
         d_model = self.input_shape[1]

@@ -8,7 +8,6 @@ from keras.models import load_model
 from models.linear import LinearModel
 from models.lstm import LSTMModel
 from models.rnn import RNNModel
-from models.naive_bayes import NaiveBayes
 from sklearn.preprocessing import MinMaxScaler
 from models.decoder_transformer import DecoderTransformer
 from models.encoder_transformer import EncoderTransformer

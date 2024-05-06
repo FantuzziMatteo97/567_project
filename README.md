@@ -31,14 +31,11 @@ We opted to utilize a dataset containing the daily statistics of the VOO symbol,
 
 - Output
     - Regression: closing stock price for day *t*
-        - RMSE
         - MSE
-        - MAE
-        - R^2
-
-    - Classification: bear, bull, neutral for day *t*
-        - Precision
-        - Recall
-        - F1-Score
-        - Accuracy
-        - Confusion Matrix
+          
+## How to Run
+Execute the following command in the terminal to run the model:
+```sh
+python train.py  [model_name] --timesteps=t --batch_size=b --epochs=n
+```
+model name is either rnn, linear, encoder, decoder or lstm
