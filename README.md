@@ -38,3 +38,4 @@ Execute the following command in the terminal to run the model:
 ```sh
 python train.py  [model_name] --epochs=n --timestep=t --batch_size=b
 ```
+model name is either rnn, linear, encoder, decoder or lstm
