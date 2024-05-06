@@ -18,6 +18,7 @@ class BaseModel:
         self.input_shape = input_shape
         self.optimizer = optimizer
         self.loss = loss
+        self.checkpoint_filepath = f'.best_{self.__class__.__name__.lower()}.keras'
         self.build_model()
 
     def build_model(self):
@@ -42,9 +43,9 @@ class BaseModel:
         Returns:
             History: Object containing training history.
         """
-        checkpoint_filepath = f'.best_{self.__class__.__name__.lower()}.keras'
+
         checkpoint = ModelCheckpoint(
-            filepath=checkpoint_filepath,
+            filepath=self.checkpoint_filepath,
             monitor='val_loss',
             mode='min',
             save_best_only=True)
@@ -53,7 +54,7 @@ class BaseModel:
 
         history = self.model.fit(x=X_train, y=y_train, batch_size=batch_size, epochs=epochs, validation_data=(X_val, y_val), callbacks=[checkpoint])
 
-        self.model = load_model(checkpoint_filepath)
+        self.model = load_model(self.checkpoint_filepath)
         return history
 
     def predict(self, X):
@@ -82,3 +83,6 @@ class BaseModel:
         y_pred = self.predict(X)
         mse = np.mean((y - y_pred) ** 2)
         return mse
+
+    def load_checkpoint(self):
+        self.model = load_model(self.checkpoint_filepath)
