@@ -6,7 +6,6 @@ from models.encoder_transformer import EncoderTransformer
 from models.linear import LinearModel
 from models.lstm import LSTMModel
 from models.rnn import RNNModel
-from models.naive_bayes import NaiveBayes
 from sklearn.preprocessing import MinMaxScaler
 from util.data_wrangling import convert_df_to_inputs_targets, get_dataset_df, train_val_test_split
 
@@ -56,8 +55,6 @@ def main(model_type, timesteps, batch_size, epochs):
         model = DecoderTransformer(scaler=close_scaler, input_shape=X_train.shape[1:])
     elif model_type.lower() == 'linear':
         model = LinearModel(scaler=close_scaler, input_shape=X_train_flattened.shape[1:])
-    elif model_type.lower() == 'naive_bayes':
-        model = NaiveBayes(scaler=close_scaler, input_shape=X_train_flattened.shape[1:])
     else:
         raise ValueError("Invalid model type.")
     
@@ -129,7 +126,7 @@ def main(model_type, timesteps, batch_size, epochs):
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Train and evaluate deep learning model for stock price prediction")
-    parser.add_argument("model_type", type=str, choices=['rnn', 'lstm', 'encoder', 'decoder', 'linear', 'naive_bayes'], help="Type of model to train")
+    parser.add_argument("model_type", type=str, choices=['rnn', 'lstm', 'encoder', 'decoder', 'linear'], help="Type of model to train")
     parser.add_argument("--timesteps", type=int, default=5, help="Number of timesteps for input sequences (default: 5)")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training (default: 32)")
     parser.add_argument("--epochs", type=int, default=50, help="Number of epochs for training (default: 50)")

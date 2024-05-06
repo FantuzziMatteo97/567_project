@@ -6,7 +6,6 @@ from util.data_wrangling import convert_df_to_inputs_targets, get_dataset_df, tr
 from models.linear import LinearModel
 from models.lstm import LSTMModel
 from models.rnn import RNNModel
-from models.naive_bayes import NaiveBayes
 from sklearn.preprocessing import MinMaxScaler
 from models.decoder_transformer import DecoderTransformer
 from models.encoder_transformer import EncoderTransformer
@@ -51,8 +50,7 @@ def run_tests(timesteps):
         'lstm': LSTMModel(scaler=close_scaler, input_shape=X_train.shape[1:]),
         'encoder': EncoderTransformer(scaler=close_scaler, input_shape=X_train.shape[1:]),
         'decoder': DecoderTransformer(scaler=close_scaler, input_shape=X_train.shape[1:]),
-        'linear': LinearModel(scaler=close_scaler, input_shape=X_train_flattened.shape[1:]),
-        'bayes': NaiveBayes(scaler=close_scaler, input_shape=X_train_flattened.shape[1:])
+        'linear': LinearModel(scaler=close_scaler, input_shape=X_train_flattened.shape[1:])
     }
 
     results = {}
