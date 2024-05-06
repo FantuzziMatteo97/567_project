@@ -7,10 +7,7 @@ class LinearModel(BaseModel):
         super().__init__(scaler, input_shape, optimizer, loss)
 
     def build_model(self):
-        d_ff = 64
-
         self.model = Sequential([
             Input(shape=self.input_shape),
-            Dense(d_ff, activation='relu'),
             Dense(1, activation='linear')
         ])
