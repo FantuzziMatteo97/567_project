@@ -34,7 +34,7 @@ We opted to utilize a dataset containing the daily statistics of the VOO symbol,
         - MSE
           
 ## How to Run
-Execute the following command in the terminal to run the model:
+Execute the following command in the terminal to train the model:
 ```sh
 python train.py  [model_name] --timesteps=t --batch_size=b --epochs=n
 ```
