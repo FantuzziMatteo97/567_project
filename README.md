@@ -45,3 +45,6 @@ Execute the following command in the terminal to generate plots of all models wi
 python test.py --timesteps=t
 ```
 timesteps used to generate the optimal plot should be identical to ones used in the training
+
+## Requirements
+Requirements to run this project can be found at the requirements.txt
