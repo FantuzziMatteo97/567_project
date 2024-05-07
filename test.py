@@ -56,25 +56,34 @@ def run_tests(timesteps):
     decoder.load_checkpoint()
     linear.load_checkpoint()
 
-    results = {}
-    results['rnn'] = rnn.predict(X_test)
-    results['lstm'] = lstm.predict(X_test)
-    results['encoder'] = encoder.predict(X_test)
-    results['decoder'] = decoder.predict(X_test)
-    results['linear'] = linear.predict(X_test_flattened)
-    results['true'] = close_scaler.inverse_transform(y_test.reshape(-1, 1))
-    plot_all(results)
+    test_results = {}
+    test_results['rnn'] = rnn.predict(X_test)
+    test_results['lstm'] = lstm.predict(X_test)
+    test_results['encoder'] = encoder.predict(X_test)
+    test_results['decoder'] = decoder.predict(X_test)
+    test_results['linear'] = linear.predict(X_test_flattened)
+    test_results['true'] = close_scaler.inverse_transform(y_test.reshape(-1, 1))
+    plot_all(test_results, 'Test')
+
+    val_results = {}
+    val_results['rnn'] = rnn.predict(X_val)
+    val_results['lstm'] = lstm.predict(X_val)
+    val_results['encoder'] = encoder.predict(X_val)
+    val_results['decoder'] = decoder.predict(X_val)
+    val_results['linear'] = linear.predict(X_val_flattened)
+    val_results['true'] = close_scaler.inverse_transform(y_val.reshape(-1, 1))
+    plot_all(val_results, 'Validation')
 
 
-def plot_all(results):
+def plot_all(results, file_name):
     plt.figure(figsize=(30, 10))
     for name, result in results.items():
         plt.plot(result, label=name)
     plt.xlabel("Days")
     plt.ylabel("Close price")
-    plt.title(f"Actual vs Predicted Close Price | Test")
+    plt.title(f"Actual vs Predicted Close Price | {file_name}")
     plt.legend()
-    plt.savefig(f'results/all/test_pred_plot_of_best_models')
+    plt.savefig(f'results/all/{file_name}_pred_plot_of_best_models')
     plt.show()
 
 
@@ -92,7 +101,7 @@ def setup():
 if __name__ == '__main__':
     setup()
     parser = argparse.ArgumentParser(description="Test and evaluate deep learning model for stock price prediction")
-    parser.add_argument("--timesteps", type=int, default=10,
+    parser.add_argument("--timesteps", type=int, default=5,
                         help="Number of timesteps for input sequences (default: 5) for lstm")
     args = parser.parse_args()
     run_tests(timesteps=args.timesteps)
