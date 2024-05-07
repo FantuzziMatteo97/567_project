@@ -9,7 +9,7 @@ class EncoderTransformer(BaseModel):
     def build_model(self):
         d_k = 8
         d_v = 8
-        n_heads = 4
+        n_heads = 2
         d_ff = 8
 
         timesteps = self.input_shape[0]
